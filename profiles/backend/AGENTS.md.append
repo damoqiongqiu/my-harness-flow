@@ -1,0 +1,15 @@
+<!-- my-harness-flow profile: backend — 追加到 AGENTS.md 路由表末尾 -->
+
+## 服务端专属路由
+
+| 用户意图 | SKILL 链 | 说明 |
+|---------|---------|------|
+| API 契约变更 | `api-contract-test` → 确认 breaking change → `start-task` | 先验证契约兼容性，再决定是否需要 spec |
+| 数据库迁移 | `db-migration-verify` → `diagnose`（失败时） | 验证 up/down 可逆 + 幂等 + 数据安全 |
+| 集成测试 | `integration-test` → `diagnose`（失败时） | 多模块协作链路（DB/Cache/MQ）验证 |
+
+## 服务端硬规则
+
+- **Migration 先验后提交**：任何 migration 文件提交前必须通过 `db-migration-verify`
+- **API 不静默破坏**：接口变更必须更新对应契约测试
+- **Config 环境变量化**：所有环境差异（端口/密钥/数据库地址）通过环境变量注入，禁止硬编码

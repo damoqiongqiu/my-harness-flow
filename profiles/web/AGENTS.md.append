@@ -1,0 +1,15 @@
+<!-- my-harness-flow profile: web — 追加到 AGENTS.md 路由表末尾 -->
+
+## 前端专属路由
+
+| 用户意图 | SKILL 链 | 说明 |
+|---------|---------|------|
+| 组件开发 | `component-test` → `quality-gate` → `finish-task` | 先验证组件行为，再走标准流程 |
+| E2E 流程变更 | `e2e-test` → `diagnose`（失败时） | 核心用户流程浏览器验证 |
+| 发布前检查 | `build-verify` → `quality-gate` → `finish-task` | TypeScript/lint/build/audit 全量通过 |
+
+## 前端硬规则
+
+- **构建不通过不提交**：任何 commit 前 `npm run build` 必须通过
+- **lint 零警告**：ESLint/Prettier 提交前必须通过
+- **无高危依赖**：`npm audit --audit-level=high` 零发现

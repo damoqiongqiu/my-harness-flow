@@ -1,0 +1,16 @@
+# {{PROJECT_NAME}} 项目上下文快照
+# 用途：AI agent / 开发者快速了解项目当前状态（session-start 技能会读取本文件）
+
+project:
+  name: "{{PROJECT_NAME}}"
+  description: "{{PROJECT_DESCRIPTION}}"
+  status: 开发中
+
+# 基础设施 / 运行环境（按实际情况填写）
+infrastructure: {}
+
+# 当前重点（保持精简，完成的移到 checklist.md）
+current_focus: []
+
+# 已知风险 / 注意事项
+known_risks: []

@@ -1,0 +1,42 @@
+# 框架自用 CI（my-harness-cli.sh 分发时排除本文件）
+name: CI
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Install test dependencies
+        run: python3 -m pip install --quiet pyyaml
+
+      - name: Run harness tests
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/harness-tests
+
+      - name: Compile Python scripts
+        run: |
+          PYTHONPYCACHEPREFIX=/tmp/harness-flow-pycache python3 -m py_compile \
+            .github/scripts/*.py \
+            .github/skills/implement-specs/scripts/*.py \
+            .github/skills/review-pr/scripts/validate_review_json.py \
+            .github/skills/update-pr-review/scripts/*.py
+
+      - name: Installer syntax and dry-run
+        run: |
+          bash -n my-harness-cli.sh
+          bash my-harness-cli.sh --target "$(mktemp -d)" --dry-run

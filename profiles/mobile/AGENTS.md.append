@@ -1,0 +1,22 @@
+<!-- my-harness-flow profile: mobile — 追加到 AGENTS.md 路由表末尾 -->
+
+## 移动端专属路由
+
+| 用户意图 | SKILL 链 | 说明 |
+|---------|---------|------|
+| 原生 UI 开发 | `simulator-manage` → `ui-automation-test` → `diagnose` | 先确保模拟器可用，再跑 UI 测试 |
+| Flutter 开发 | `simulator-manage` → `build-verify` → `quality-gate` | Flutter analyze + test + build |
+| 发布准备 | `build-sign` → `quality-gate` → `finish-task` | 构建 + 签名 + 包体验证 |
+| 模拟器问题 | `simulator-manage` → `diagnose` | 先排查设备可用性 |
+
+## 移动端硬规则
+
+- **构建产物可复现**：依赖版本锁定必须提交（Podfile.lock / gradle.lockfile / pubspec.lock）
+- **签名不过期**：provisioning profile / keystore 有效期检查
+- **包体不超阈值**：IPA < 200MB / APK < 100MB（或合理的增长理由）
+
+### Flutter 专属
+- **`flutter analyze` 零问题**：提交前必须通过 `flutter analyze --no-fatal-infos`
+- **`dart format` 一致**：CI 或 pre-push hook 强制格式检查
+- **`flutter test` 全覆盖**：核心逻辑必须有单元/Widget 测试
+- **平台通道隔离**：原生代码变更（iOS/Android 平台目录）需额外审查
