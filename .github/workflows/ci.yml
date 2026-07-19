@@ -2,6 +2,8 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
@@ -40,3 +42,6 @@ jobs:
         run: |
           bash -n my-harness-cli.sh
           bash my-harness-cli.sh --target "$(mktemp -d)" --dry-run
+
+      - name: L5 全量回归（吃狗粮）
+        run: bash tests/scenarios/l5-regression/run-l5-regression.sh
