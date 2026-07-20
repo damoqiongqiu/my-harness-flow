@@ -148,10 +148,14 @@ detect_platform() {
     *gitlab*|*git.selfhosted*) printf 'gitlab' ;;
     *github*) printf 'github' ;;
     *)
-      # 自建 GitLab 域名可能不含 gitlab：尝试 API 探测
+      # 自建 GitLab 域名可能不含 gitlab：尝试 API 探测（HTTP + HTTPS）
       local api_url probe
       api_url="$(echo "$remote_url" | sed 's|://[^@]*@|://|' | sed 's|\(://[^/]*\).*|\1/api/v4/version|')"
       probe="$(curl -sf "$api_url" 2>/dev/null)" || true
+      if [ -z "$probe" ]; then
+        api_url="$(echo "$api_url" | sed 's|^http://|https://|')"
+        probe="$(curl -sf "$api_url" 2>/dev/null)" || true
+      fi
       if echo "$probe" | grep -qE '"version"|"message"'; then
         printf 'gitlab'
       else
@@ -162,6 +166,8 @@ detect_platform() {
 }
 platform=$(detect_platform)
 [ "$platform" = "gitlab" ] && ! command -v glab >/dev/null 2>&1 && info "检测到 GitLab remote，建议安装 glab CLI: brew install glab"
+# 自建 GitLab 注意：如果 HTTP（非 HTTPS），认证时加 --api-protocol http
+[ "$platform" = "gitlab" ] && [ -n "$remote_url" ] && echo "$remote_url" | grep -q "^http://" && info "GitLab 使用 HTTP: glab auth login 时请加 --api-protocol http"
 
 # ── 交互工具 ─────────────────────────────────────────────────────
 # 从 /dev/tty 读取用户选择；无 TTY 时返回空（由调用方决定安全默认）。
