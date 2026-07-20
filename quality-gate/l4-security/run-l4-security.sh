@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # L4 安全测试 — 硬编码密码扫描 + 品牌中性
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 PASS=0 WARN=0 FAIL=0
 
 pass() { PASS=$((PASS+1)); }

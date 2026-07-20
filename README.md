@@ -132,7 +132,7 @@ HARNESS_FLOW_ANSWER=k ./my-harness-cli.sh install --target ./repo
 安装器做三件事：
 
 1. **受管目录同步**（rsync，可重复执行）：`.agents/skills`、`.agents/contracts`、`.github/{skills,agents,scripts,workflows}`
-2. **模板实例化**（只补缺，绝不覆盖已有文件）：`AGENTS.md`、`CLAUDE.md`、`docs/{bugs,design-docs,exec-plans,generated,plan,product-specs,references,reports,work-journal}`、`specs/`（含产品/技术 spec 模板）、`tests/scenarios/{l1..l5}`
+2. **模板实例化**（只补缺，绝不覆盖已有文件）：`AGENTS.md`、`CLAUDE.md`、`docs/{bugs,design-docs,exec-plans,generated,plan,product-specs,references,reports,work-journal}`、`specs/`（含产品/技术 spec 模板）、`quality-gate/{l1..l5}`
 3. **多 agent 技能注册**（软链，幂等）：
    - WorkBuddy → `~/.workbuddy/skills/`（**用户级**——harness 只扫用户级目录，不扫项目级）
    - Claude Code → `.claude/skills/`、Gemini CLI → `.gemini/skills/`（项目级，agentskills.io 规范）
@@ -141,7 +141,7 @@ HARNESS_FLOW_ANSWER=k ./my-harness-cli.sh install --target ./repo
 安装后必做：
 
 1. 编辑 `AGENTS.md`，替换 `{{PROJECT_NAME}}` 等占位符，填写模块清单与硬规则
-2. 按项目技术栈实现 `tests/scenarios/` 下各层脚本（保持脚本名与退出码约定：0 = PASS）
+2. 按项目技术栈实现 `quality-gate/` 下各层脚本（保持脚本名与退出码约定：0 = PASS）
 3. 重开 agent 工具会话，让新技能进入可用列表
 
 > **自动化安装（CI / 脚本）**：在非交互环境中，可用 `HARNESS_FLOW_ANSWER` 环境变量注入交互回答：
@@ -224,7 +224,7 @@ my-harness-flow/
     ├── AGENTS.md.template  # 项目路由表模板（占位符化）
     ├── docs/               # bugs / design-docs / exec-plans 等全量骨架
     ├── specs/              # spec 目录约定 + 产品/技术 spec 模板
-    └── tests/scenarios/    # L1-L5 分层测试骨架
+    └── quality-gate/    # L1-L5 分层测试骨架
 ```
 
 ## 7. CI 自动化（可选启用）

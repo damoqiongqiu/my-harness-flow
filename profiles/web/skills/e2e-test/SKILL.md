@@ -26,7 +26,7 @@ npx playwright test
 npx cypress run
 ```
 
-在 `tests/scenarios/l3-e2e/` 中注册场景。
+在 `quality-gate/l3-e2e/` 中注册场景。
 
 ## 3. 输出
 

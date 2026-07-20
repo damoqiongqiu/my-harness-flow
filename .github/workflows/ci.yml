@@ -44,4 +44,4 @@ jobs:
           bash my-harness-cli.sh --target "$(mktemp -d)" --dry-run
 
       - name: L5 全量回归（吃狗粮）
-        run: bash tests/scenarios/l5-regression/run-l5-regression.sh
+        run: bash quality-gate/l5-regression/run-l5-regression.sh
