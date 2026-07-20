@@ -443,6 +443,39 @@ install_templates() {
   local f rel
   local updated_template_list="" updated_count=0
 
+  # ── 已有项目结构检测 ─
+  # 目标已有 docs/ 目录且非 harness 首次安装 → 提示用户
+  if [ -d "$target_dir/docs" ] && [ "$state" != "initialized" ]; then
+    # 检查 docs/ 下是否有非 harness 模板的文件
+    local harness_templates="exec-plans work-journal bugs reports plan references design-docs generated product-specs"
+    local has_custom=0
+    for entry in "$target_dir/docs"/*; do
+      [ ! -e "$entry" ] && continue
+      local name="$(basename "$entry")"
+      if ! echo "$harness_templates" | grep -qw "$name" && [ "$name" != "README.md" ]; then
+        has_custom=1; break
+      fi
+    done
+    if [ "$has_custom" -eq 1 ]; then
+      info "⚠  检测到目标项目已有自定义 docs/ 目录结构"
+      info "⚠  安装后将追加 harness 子目录（exec-plans/ work-journal/ 等），可能混入已有结构"
+      if [ "$conflict_policy" = "skip" ]; then
+        info "→ --skip-existing 模式：跳过模板安装以避免目录混杂"
+        return 0
+      fi
+      if [ "$non_interactive" = true ]; then
+        info "→ --yes 模式：自动接受整合，追加 harness 子目录到现有 docs/"
+      else
+        local answer
+        answer="$(ask_user '继续安装？（y=接受整合 / n=退出）[y/n] ')" || answer="n"
+        case "$answer" in
+          y|Y|yes|YES) info "→ 接受整合，追加 harness 子目录到现有 docs/" ;;
+          *) info "→ 已退出。如需迁移，备份 docs/ 后重新安装。"; exit 0 ;;
+        esac
+      fi
+    fi
+  fi
+
   install_agents_md
 
   # CLAUDE.md：真实文件，用 @AGENTS.md 导入语法指向统一指引
