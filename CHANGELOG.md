@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.1] - 2026-07-20
+
+### Added
+- **GitLab 双平台完整适配**：CLI `detect_platform()` API 探测（HTTP+HTTPS）、`glab` 自动检测提示、`.gitlab-ci.yml` 模板（L1-L5 五层）且安装时自动复制
+- **目标项目路径规则**：8 个技能加注文档归属（exec-plan/spec/work-journal/bug/report → 目标项目，非 framework），AGENTS.md.template 新增 §0 路径约定表
+- **安装时自定义 docs 检测**：已有非 harness 的 `docs/` 时交互确认（y=接受整合 / n=退出），`--yes` 自动接受
+- **GitLab CI Pipeline 模板**：`templates/.gitlab-ci.yml.template`，GitLab 平台安装时自动复制
+- **升级时 Profile 差异检测**：`install --profile` 时同时扫描 `profiles/` 目录，报告未选中 profile 的文件差异
+
+### Changed
+- **Web profile L1 默认启用**：`tsc --noEmit`、`eslint`、`jest` 从注释改为默认执行，无工具时 SKIP（不阻塞）
+- **Jest/ESLint 检测改文件判断**：从 `npx --version` 改为 `[ -x node_modules/.bin/jest ]`，避免 npx 自动下载误判
+- **技能文档 GitLab 适配**：`create-issue`（glab issue create）、`create-pr`（glab mr create）新增双 CLI 命令分支
+
+### Verified
+- demo-nextjs 项目上的全量覆盖测试（16/18 能力验证，L5 全绿）
+- GitHub + 内网 GitLab（10.x.x.x）双 remote 推送实测
+- `gh` + `glab` CLI 双平台 issue/MR 创建实测
+
 ## [0.4.0] - 2026-07-18
 
 ### Added
