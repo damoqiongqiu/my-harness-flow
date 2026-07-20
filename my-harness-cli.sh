@@ -140,6 +140,19 @@ done
 target_dir="$(cd "$target_dir" && pwd)"
 [ "$target_dir" = "$script_dir" ] && fail "目标不能是 my-harness-flow 源码树自身（用 --target 指定其他目录）"
 
+# ── 平台检测 ─────────────────────────────────────────────────────
+detect_platform() {
+  local remote_url
+  remote_url="$(cd "$target_dir" && git remote get-url origin 2>/dev/null)" || remote_url=""
+  case "$remote_url" in
+    *gitlab*|*git.selfhosted*) printf 'gitlab' ;;
+    *github*) printf 'github' ;;
+    *) printf 'unknown' ;;
+  esac
+}
+platform=$(detect_platform)
+[ "$platform" = "gitlab" ] && ! command -v glab >/dev/null 2>&1 && info "检测到 GitLab remote，建议安装 glab CLI: brew install glab"
+
 # ── 交互工具 ─────────────────────────────────────────────────────
 # 从 /dev/tty 读取用户选择；无 TTY 时返回空（由调用方决定安全默认）。
 # HARNESS_FLOW_ANSWER 环境变量可注入答案（自动化测试用）。
@@ -460,7 +473,7 @@ MDC
       mkdir -p "$(dirname "$dst")"
       cp "$f" "$dst"
     fi
-  done < <(find "$script_dir/templates/docs" "$script_dir/templates/tests" "$script_dir/templates/specs" -type f)
+  done < <(find "$script_dir/templates/docs" "$script_dir/templates/tests" "$script_dir/templates/specs" -type f; find "$script_dir/templates" -maxdepth 1 -type f 2>/dev/null)
 
   # Profile 文件差异检测（路径映射: profiles/<name>/X → target/X）
   while IFS= read -r f; do

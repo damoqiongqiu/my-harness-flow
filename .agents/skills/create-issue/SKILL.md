@@ -121,13 +121,19 @@ gh repo view "$repo" --json isSecurityPolicyEnabled,securityPolicyUrl,url
 
 ### 2.7 创建并报告
 
-使用 GitHub CLI，传入 argv 安全的值：
+使用检测到的 CLI，传入 argv 安全的值：
 
 ```bash
+# GitHub
 gh issue create --repo "$repo" --title "$title" --body-file "$body_file"
+
+# GitLab (glab)
+glab issue create --repo "$repo" --title "$title" --description "$(cat "$body_file")"
 ```
 
 将仓库、标题、正文文件和元数据作为独立参数传入。不要将用户或对话中提取的标题/正文文本直接粘贴到 shell 命令中；如果使用 shell 变量，给扩展加引号，避免 `eval` 或命令替换。仅对步骤 5 中选定的元数据添加 `--label`、`--assignee`、`--milestone` 或 project 标志。
+
+如果 `gh` 不可用且 `glab` 不可用、或未认证或缺乏权限，不使用 API 或原始 HTTP 后备。报告手动创建所需的精确仓库、标题、正文和明确元数据。
 
 如果 `gh` 不可用、未认证或缺乏权限，不使用 `gh api` 或原始 HTTP 后备。报告手动创建所需的精确仓库、标题、正文和明确元数据。
 

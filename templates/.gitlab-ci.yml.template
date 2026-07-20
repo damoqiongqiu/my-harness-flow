@@ -1,0 +1,47 @@
+# GitLab CI — my-harness-flow 自动化（模板）
+# 复制到目标项目 .gitlab-ci.yml 后按需调整
+# 需要: glab CLI + runner 环境安装 python3 / bash
+
+stages:
+  - test
+  - security
+  - regression
+
+variables:
+  PYTHONPYCACHEPREFIX: /tmp/harness-pycache
+
+L1 冒烟:
+  stage: test
+  image: node:lts
+  script:
+    - bash l1-health-check.sh
+
+L2 单元:
+  stage: test
+  image: node:lts
+  script:
+    - bash tests/scenarios/l2-integration/run-l2-integration.sh
+  allow_failure: false
+
+L3 E2E:
+  stage: test
+  image: node:lts
+  script:
+    - bash tests/scenarios/l3-e2e/run-l3-e2e.sh
+  allow_failure: false
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+L4 安全:
+  stage: security
+  image: node:lts
+  script:
+    - bash tests/scenarios/l4-security/run-l4-security.sh
+
+L5 回归:
+  stage: regression
+  image: node:lts
+  script:
+    - bash tests/scenarios/l5-regression/run-l5-regression.sh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'

@@ -83,6 +83,9 @@ git remote -v
    如果没有打开的 PR，创建一个。同分支名已合并或已关闭的 PR 不可复用，不得阻止创建新 PR：
    ```bash
    gh pr create --base "$base" --head "$branch" --title "$title" --body-file "$body_file"
+
+   # GitLab
+   glab mr create --source-branch "$branch" --target-branch "$base" --title "$title" --description "$(cat "$body_file")"
    ```
    将生成的标题/正文/基准/头部分支值作为独立 argv 风格参数传入。
    不要将从用户、issue、分支或 commit 中提取的文本直接粘贴到 shell 命令行中；如果使用 shell 变量，不带 `eval` 或命令替换地填充它们，并始终给扩展加引号。
