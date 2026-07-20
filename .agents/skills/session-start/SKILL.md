@@ -5,6 +5,8 @@ description: 新会话恢复上下文：依次读 AGENTS.md → checklist/contex
 
 # session-start
 
+**目标项目路径规则**：读 `docs/exec-plans/`、`docs/work-journal/` 时从**目标项目**读取。如果当前工作目录在 harness framework，先通过 AGENTS.md 或 `.agents/.harness-flow-installed` 定位目标项目路径。
+
 恢复上下文：知道项目是什么、当前做到哪、下一步该干什么。
 
 ## 1. 流程

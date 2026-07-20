@@ -5,6 +5,8 @@ description: quality-gate 失败或异常后的分层归因：严格按 test→e
 
 # diagnose
 
+**目标项目路径规则**：bug 记录写入**目标项目**的 `docs/bugs/`。测试日志从目标项目的 `tests/scenarios/` 读取。
+
 分析 quality-gate 失败或异常的根因，按优先级分层归因。
 
 ## 1. 归因前判断

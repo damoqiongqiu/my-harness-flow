@@ -2,6 +2,22 @@
 
 {{PROJECT_DESCRIPTION}}
 
+## 0. 路径约定（CRITICAL）
+
+本项目通过 my-harness-flow 安装。当 agent 工作目录在 harness framework 仓库时，以下目录的**所有读写操作必须指向本项目**（非 framework 仓库）：
+
+| 目录 | 用途 | 示例 |
+|------|------|------|
+| `docs/exec-plans/` | 任务进度文件 | start-task 写、finish-task 移 |
+| `docs/work-journal/` | 每日工作日志 | finish-task 追加 |
+| `docs/bugs/` | 问题记录 | diagnose 写 |
+| `docs/reports/` | 复盘报告 | retrospect 写 |
+| `docs/plan/` | 方案摘要 | start-task 可选写 |
+| `specs/` | 产品/技术 spec | write-product-spec/write-tech-spec 写 |
+| `tests/scenarios/` | L1-L5 测试脚本 | quality-gate 跑 |
+
+> **规则**: 如果文件涉及任务进度、工作日志、spec、测试、问题记录——写到本项目。只有 `.agents/` 下的技能文件和 `.github/workflows/` 由 harness 安装器管理，不手动改。
+
 ## 快速路由（收到用户请求后，先查此表）
 
 | 用户意图 | SKILL 链 | 说明 |

@@ -5,6 +5,8 @@ description: 收尾当前任务：基于真实 diff 精确暂存并提交（禁 
 
 # finish-task
 
+**目标项目路径规则**：exec-plan 移动（`active/` → `completed/`）和 work-journal 写入均操作**目标项目**的 `docs/`，非 framework 项目。如果当前工作目录在 harness framework，先确定目标项目路径再操作。
+
 收尾当前任务的改动：精确提交 + 推送 + 创建 PR + 留痕。
 
 ## 1. 流程
