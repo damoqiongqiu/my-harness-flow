@@ -15,6 +15,18 @@ description: 收尾当前任务：基于真实 diff 精确暂存并提交（禁 
 1. 用 `git-commit` 精确 stage 变更文件（格式见 `AGENTS.md` commit 规范，禁止 git add .）。
 2. 用 `git-push` 推送分支（禁止 force push main）。
 3. 用 `create-pr` 创建 PR（描述含 summary + 验证证据 + issue 链接 + 无明文密码）。
+3.5 **合并后校验（MUST）**：若 PR 被 squash merge：
+   - **等待 GitHub 落盘**：`gh pr view <N> --repo <owner/repo> --json mergedAt` 直到返回非空时间戳
+   - **pull 后校验**：`git pull origin main` 后确认关键文件存在：
+     ```bash
+     # 确认 spec 文件未丢失（squash merge 常见的幽灵漏洞）
+     for spec_dir in $(find docs/exec-plans/completed -name "*.md" -maxdepth 1 2>/dev/null); do
+       topic=$(basename "$spec_dir" .md)
+       [ -d "specs/$topic" ] || echo "⚠ 缺失 specs/$topic/ ——请从分支恢复"
+     done
+     bash .agents/quality-gate/l1-health-check.sh | grep "Spec 完整性"
+     ```
+   - **缺失则恢复**：`git checkout <branch-sha> -- specs/<topic>/` 然后追加 commit
 4. 写 `docs/work-journal/YYYY-MM-DD.md` 一行交付记录。
 5. 把 `docs/exec-plans/active/<任务简称>.md` 移到 `docs/exec-plans/completed/`，标注完成时间。
 6. 若本次改动涉及生成物（schema 导出、codegen、文档编译等）且项目提供了刷新脚本，运行对应脚本并把产物一并提交（脚本位置见项目 `AGENTS.md`；没有则跳过）。
