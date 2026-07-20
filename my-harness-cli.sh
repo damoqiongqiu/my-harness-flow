@@ -407,25 +407,31 @@ install_agents_md() {
   local dst="$target_dir/AGENTS.md"
 
   # 1. 无 AGENTS.md → 全新创建
+  local project_name; project_name="$(basename "$target_dir")"
   if [ ! -e "$dst" ]; then
-    install_file_if_missing "$tpl" "$dst"
-    [ "$dry_run" = false ] && info "提示: 已生成 AGENTS.md，请替换其中 {{PROJECT_NAME}} 等占位符。"
+    if [ "$dry_run" = false ]; then
+      sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g" "$tpl" > "$dst"
+      info "提示: 已生成 AGENTS.md"
+    fi
     return 0
   fi
 
-  # 2. 已有 harness 标记 → 检查是否需要刷新
-  if grep -q 'my-harness-flow' "$dst" 2>/dev/null; then
+  # 2. 已有 harness 标记段 → 原地替换内容
+  if grep -q 'my-harness-flow: begin' "$dst" 2>/dev/null; then
     if grep -q '{{PROJECT_NAME}}\|{{PROJECT_DESCRIPTION}}' "$dst" 2>/dev/null; then
-      # 检测到旧版占位符 → 剥离所有旧 harness 残留再重新插入
-      # 1. 去除 harness 标记段
-      sed -i '' '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/d' "$dst"
-      # 2. 去除旧版残留（从"用户自定义"分隔线到 profile 标记之前的所有旧模板内容）
-      sed -i '' '/<!-- 以下为用户自定义内容.*/,$ d' "$dst"
-      info "提示: 检测到旧版 harness 内容，正在刷新..."
-    else
-      [ "$dry_run" = false ] && info "提示: AGENTS.md 已含 harness 路由规则，跳过"
+      # 标记段内有占位符 → 原地替换（不移动、不删用户内容）
+      if [ "$dry_run" = false ]; then
+        local htmp; htmp="$(mktemp "${TMPDIR:-/tmp}/hf-harness-XXXXXX")"
+        sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
+          | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" > "$htmp"
+        python3 "$script_dir/.agents/scripts/replace_harness_section.py" "$dst" "$htmp"
+        rm -f "$htmp"
+        info "提示: 检测到旧版 harness 内容，已原位刷新"
+      fi
       return 0
     fi
+    [ "$dry_run" = false ] && info "提示: AGENTS.md 已含 harness 路由规则，跳过"
+    return 0
   fi
 
   # 3. 用户自有的 AGENTS.md → 静默前置插入 harness 内容
@@ -434,27 +440,17 @@ install_agents_md() {
     return 0
   fi
 
-  # 提取模板中 harness section，替换占位符
+  # 提取模板中 harness section
   local harness_section
-  local project_name
-  project_name="$(basename "$target_dir")"
   harness_section="$(sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
     | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" \
     | grep -vxF '')"
 
-  # 前置插入：harness 头部 + 用户原内容
+  # 前置插入
   local tmp="$(mktemp "${TMPDIR:-/tmp}/hf-agents-XXXXXX")"
-  {
-    echo "$harness_section"
-    echo ""
-    echo "---"
-    echo ""
-    echo "<!-- 以下为用户自定义内容，由 my-harness-flow 原样保留 -->"
-    echo ""
-    cat "$dst"
-  } > "$tmp"
+  { echo "$harness_section"; echo ""; cat "$dst"; } > "$tmp"
   mv "$tmp" "$dst"
-  info "提示: harness 路由规则已插入 AGENTS.md 头部，你的内容在下方原样保留。"
+  info "提示: harness 路由规则已前置插入，你的内容在下方原样保留。"
 }
 
 install_templates() {
