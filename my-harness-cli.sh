@@ -519,6 +519,7 @@ MDC
   while IFS= read -r f; do
     rel="${f#"$script_dir"/templates/}"
     case "$rel" in *.gitkeep) mkdir -p "$(dirname "$target_dir/$rel")" 2>/dev/null || true; continue ;; esac
+    case "$rel" in AGENTS.md.template) continue ;; esac  # harness 施工图，不安装到用户项目
     local dst="$target_dir/$rel"
     if [ -e "$dst" ]; then
       # 文件已存在，检查内容和当前版本是否一致
