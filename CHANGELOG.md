@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.5.0] - 2026-07-20
+
+### Breaking
+- **`tests/` → `.agents/quality-gate/`**：门禁脚本重命名并隐藏到 `.agents/`，避免与框架原生 `test/` 冲突。升级时旧根目录文件保留，手动 `rm`
+- **L1/L2 脚本移入 `.agents/quality-gate/`**：从项目根目录移走，根目录零入侵
+- **模板扁平化**：移除 `scenarios/` 中间目录，`l1-smoke/` 等直接在 `quality-gate/` 下
+
+### Added
+- **Spec 门禁**：L1 §5 Spec 完整性检查——任何活跃 exec-plan 必须有对应 `specs/<topic>/`。Light 任务至少 `product.md`
+- **finish-task 合并后校验**：步骤 3.5——squash merge 后 poll GitHub API，pull 后校验 specs 完整性，缺则自动恢复
+- **backend demo 项目**：`demo-springboot`（Spring Boot 3.3 + Task CRUD API + 9 测试），三 profile 全部实测验证
+- **mobile demo 项目**：`demo_flutter`（Flutter 3.24 + harness mobile profile L1 6/6）
+
+### Fixed
+- **`.github/harness-tests` 泄漏**：`sync_managed_dirs` 的 `find .github/` 全扫未排除，56 个 Python 测试文件泄漏到用户项目
+- **squash merge 丢 spec**：`git pull` 比 GitHub 异步落盘更快导致 specs/ 丢失，`finish-task` 新增校验步骤
+- **L3 E2E profile**：`--profile web`（依赖 node_modules）→ `--profile backend`（零依赖），CI 不再报 L1-self-check
+- **L2/L3/L4 残留路径**：`scenarios/` 子目录扁平化后多处引用未同步
+- **Platform 检测**：GitLab 自建实例 API 探测（HTTP+HTTPS 双协议），`install_profile` 目标目录修正
+
+### Verified
+- 四项目双平台：demo-nextjs / demo_flutter / demo-springboot / my-harness-flow，GitHub + GitLab 同步
+- GitHub Actions CI：L1+L2+L3+L4+L5 全绿
+- 升级路径：v0.4.x → v0.5.0 零中断
+
 ## [0.4.1] - 2026-07-20
 
 ### Added
