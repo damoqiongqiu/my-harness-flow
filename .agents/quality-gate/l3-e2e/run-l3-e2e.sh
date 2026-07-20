@@ -11,17 +11,17 @@ fail() { FAIL=$((FAIL+1)); echo "  [FAIL] $1 — $2"; }
 echo "=== L3 全生命周期 E2E ==="
 echo ""
 
-# 1. 全新安装 + web profile
-echo "--- 1. 安装 + web profile ---"
-"$ROOT/my-harness-cli.sh" install --target "$TGT" --profile web --yes >/dev/null 2>&1 \
-  && pass "install+web" || fail "install+web" "安装失败"
+# 1. 全新安装 + backend profile（零依赖，bash only）
+echo "--- 1. 安装 + backend profile ---"
+"$ROOT/my-harness-cli.sh" install --target "$TGT" --profile backend --yes >/dev/null 2>&1 \
+  && pass "install+backend" || fail "install+backend" "安装失败"
 
 # 2. 确认产物
 echo "--- 2. 产物验证 ---"
 [ -f "$TGT/AGENTS.md" ] && pass "AGENTS.md" || fail "AGENTS.md" "缺失"
 [ -f "$TGT/.agents/.harness-flow-manifest" ] && pass "manifest" || fail "manifest" "缺失"
 [ -d "$TGT/.agents/quality-gate" ] && pass "test-dir" || fail "test-dir" "缺失"
-grep -q "profile: web" "$TGT/AGENTS.md" && pass "AGENTS-profile" || fail "AGENTS-profile" "未注入"
+grep -q "profile: backend" "$TGT/AGENTS.md" && pass "AGENTS-profile" || fail "AGENTS-profile" "未注入"
 
 # 3. L1 自检
 echo "--- 3. L1 自检 ---"

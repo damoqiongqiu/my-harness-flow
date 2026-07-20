@@ -51,7 +51,7 @@ echo "--- 6. upgrade ---"
 
 # ── test 7: 模板差异 ─────────────────────────────────
 echo "--- 7. 模板差异检测 ---"
-echo "# user modified" >> "$TGT/.agents/quality-gate/scenarios/l1-smoke/health-check.sh"
+echo "# user modified" >> "$TGT/.agents/quality-gate/l1-smoke/health-check.sh"
 OUT="$("$ROOT/my-harness-cli.sh" install --target "$TGT" --yes 2>&1 || true)"
 echo "$OUT" | grep -q "检测到.*模板.*更新" && pass "template-diff" || fail "template-diff" "未检测到"
 
