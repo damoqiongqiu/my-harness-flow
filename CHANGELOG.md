@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0] - 2026-07-20
+
+### Added
+- **文档格式校验**: L1 §5 扩展为 spec/work-journal/bug 格式检查，不符合模板时 WARN 不阻塞
+- **review-pr-local 验证**: prepare_local_review_inputs.py 在 demo-springboot 实测可用
+- **review-spec-local 验证**: prepare_issue_spec_context.py 编译通过
+
+
 ## [0.5.0] - 2026-07-20
 
 ### Breaking
