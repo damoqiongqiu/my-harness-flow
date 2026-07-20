@@ -411,6 +411,7 @@ install_agents_md() {
   if [ ! -e "$dst" ]; then
     if [ "$dry_run" = false ]; then
       sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g" "$tpl" > "$dst"
+      bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
       info "提示: 已生成 AGENTS.md"
     fi
     return 0
@@ -426,6 +427,7 @@ install_agents_md() {
           | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" > "$htmp"
         python3 "$script_dir/.agents/scripts/replace_harness_section.py" "$dst" "$htmp"
         rm -f "$htmp"
+        bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
         info "提示: 检测到旧版 harness 内容，已原位刷新"
       fi
       return 0
@@ -450,6 +452,7 @@ install_agents_md() {
   local tmp="$(mktemp "${TMPDIR:-/tmp}/hf-agents-XXXXXX")"
   { echo "$harness_section"; echo ""; cat "$dst"; } > "$tmp"
   mv "$tmp" "$dst"
+  bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
   info "提示: harness 路由规则已前置插入，你的内容在下方原样保留。"
 }
 
