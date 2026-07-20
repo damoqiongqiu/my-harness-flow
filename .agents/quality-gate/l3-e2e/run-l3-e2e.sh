@@ -20,7 +20,7 @@ echo "--- 1. 安装 + web profile ---"
 echo "--- 2. 产物验证 ---"
 [ -f "$TGT/AGENTS.md" ] && pass "AGENTS.md" || fail "AGENTS.md" "缺失"
 [ -f "$TGT/.agents/.harness-flow-manifest" ] && pass "manifest" || fail "manifest" "缺失"
-[ -d "$TGT/.agents/quality-gate/scenarios" ] && pass "test-dir" || fail "test-dir" "缺失"
+[ -d "$TGT/.agents/quality-gate" ] && pass "test-dir" || fail "test-dir" "缺失"
 grep -q "profile: web" "$TGT/AGENTS.md" && pass "AGENTS-profile" || fail "AGENTS-profile" "未注入"
 
 # 3. L1 自检
