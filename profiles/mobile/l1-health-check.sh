@@ -47,12 +47,10 @@ echo "5. Spec 完整性:"
 if [ -d docs/exec-plans/active ] && ls docs/exec-plans/active/*.md >/dev/null 2>&1; then
   for plan in docs/exec-plans/active/*.md; do
     topic="$(basename "$plan" .md)"
-    if grep -qE "Full.*档|spec.*驱动" "$plan" 2>/dev/null; then
-      if [ -d "specs/$topic" ]; then
-        echo "  [PASS] $topic → specs/$topic/"
-      else
-        echo "  [WARN] $topic 需要 spec 但 specs/$topic/ 不存在（建议先写 spec）"
-      fi
+    if [ -d "specs/$topic" ]; then
+      echo "  [PASS] $topic → specs/$topic/"
+    else
+      echo "  [WARN] $topic 缺 spec——请先创建 specs/$topic/product.md"
     fi
   done
 else

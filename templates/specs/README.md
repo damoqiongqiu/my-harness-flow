@@ -24,10 +24,14 @@ specs/
 
 ## 3. 何时写 spec
 
-`start-task` 技能会做 spec 决策。粗略标准：
+**任何 `docs/exec-plans/active/` 下的 exec-plan 都必须有对应 spec。** L1 质量门禁会检查这项约束。
 
-- **需要**：需求歧义大 / 预期 >1k 行或 >5 文件 / 跨模块 / 高风险行为变更 / agent 驱动实现需要更清晰的输入
-- **不需要**：小 bug 修复、简单重构、窄范围调整
+| 任务规模 | spec 要求 |
+|----------|----------|
+| Full / Standard | `product.md` + `tech.md` |
+| Light（bug 修复 / 小重构） | 至少 `product.md`（记录问题 + 修复描述） |
+
+> 即使一行 bug 修复，也写一条 spec：它会留在仓库里，开发者可以 review、复盘、追溯。Agent 跳过 spec 直接改代码是最常见的质量滑坡起点。
 
 ## 4. 生命周期
 
