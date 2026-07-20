@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # L4 安全测试 — 硬编码密码扫描 + 品牌中性
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 PASS=0 WARN=0 FAIL=0
 
 pass() { PASS=$((PASS+1)); }
@@ -41,7 +41,7 @@ fi
 # 3. 品牌中性
 echo "--- 3. 品牌中性 ---"
 HITS=$(grep -rni 'superpowers\|obra\|humanlayer\|anthropic\|Terry-Mao\|AICodingFlow' "$ROOT" \
-  --exclude-dir=.git --exclude-dir=.workbuddy --exclude-dir=deliverables --exclude-dir=tests | grep -v README.md | grep -v CHANGELOG.md || true)
+  --exclude-dir=.git --exclude-dir=.workbuddy --exclude-dir=deliverables --exclude-dir=.agents | grep -v README.md | grep -v CHANGELOG.md || true)
 if [ -z "$HITS" ]; then
   pass "品牌中性"
 else

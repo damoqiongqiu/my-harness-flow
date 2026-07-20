@@ -25,7 +25,7 @@ npm run build
 npx tsc --noEmit
 ```
 
-在 `quality-gate/l1-smoke/health-check.sh` 中添加对应检查。
+在 `.agents/quality-gate/l1-smoke/health-check.sh` 中添加对应检查。
 
 ## 3. 输出
 

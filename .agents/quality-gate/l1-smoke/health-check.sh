@@ -3,7 +3,7 @@
 # 验证文档约定的核心命令链（见 AGENTS.md 第 6 节）
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 PASS=0 FAIL=0
 
 check() { local label="$1" cmd="$2"
@@ -28,7 +28,7 @@ check "py_compile .github/scripts/*.py" "PYTHONPYCACHEPREFIX=\${TMPDIR:-/tmp}/hf
 
 echo ""
 echo "4. 品牌中性扫描:"
-check "无来源项目关键词" "! grep -rni 'superpowers\|obra\|humanlayer\|anthropic\|Terry-Mao\|AICodingFlow' $ROOT --exclude-dir=.git --exclude-dir=.workbuddy --exclude-dir=deliverables --exclude-dir=quality-gate | grep -v README.md | grep -v CHANGELOG.md | grep -q ."
+check "无来源项目关键词" "! grep -rni 'superpowers\|obra\|humanlayer\|anthropic\|Terry-Mao\|AICodingFlow' $ROOT --exclude-dir=.git --exclude-dir=.workbuddy --exclude-dir=deliverables --exclude-dir=.agents | grep -v README.md | grep -v CHANGELOG.md | grep -q ."
 
 echo ""
 echo "5. 关键文件完整性:"

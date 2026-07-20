@@ -6,11 +6,11 @@ my-harness-flow 用自己定义的 L1-L5 分层来验证自身。
 
 ```bash
 # 全量回归
-bash quality-gate/l5-regression/run-l5-regression.sh
+bash .agents/quality-gate/l5-regression/run-l5-regression.sh
 
 # 单层
-bash quality-gate/l1-smoke/health-check.sh
-bash quality-gate/l2-integration/run-l2-integration.sh
+bash .agents/quality-gate/l1-smoke/health-check.sh
+bash .agents/quality-gate/l2-integration/run-l2-integration.sh
 ```
 
 ## 分层
@@ -24,4 +24,4 @@ bash quality-gate/l2-integration/run-l2-integration.sh
 | L5 | 串联 L1-L4 | 0 Fail |
 
 > 本目录是框架自身的测试，不会分发给目标项目。
-> 目标是 `templates/quality-gate/`，安装时复制到用户仓库。
+> 目标是 `templates/.agents/quality-gate/`，安装时复制到用户仓库。

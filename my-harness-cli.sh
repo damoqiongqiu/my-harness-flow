@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # 把整套 AI 开发流装进目标仓库：
 #   1. 受管目录同步：.agents/skills、.agents/contracts、.github/{skills,agents,scripts,workflows}
-#   2. 模板实例化（只补缺，绝不静默覆盖已有文件）：AGENTS.md、docs/、quality-gate/
+#   2. 模板实例化（只补缺，绝不静默覆盖已有文件）：AGENTS.md、docs/、.agents/quality-gate/
 #   3. 多 agent 技能注册：
 #      - WorkBuddy   → 用户级 ~/.workbuddy/skills/（harness 只扫用户级，不扫项目级）
 #      - Claude Code → 项目级 .claude/skills/（agentskills.io 规范）
@@ -94,7 +94,7 @@ get_version() {
 }
 
 # 受管目录对（相对路径，源与目标同构）
-managed_dirs=".agents/skills .agents/contracts .github/skills .github/agents .github/scripts .github/workflows"
+managed_dirs=".agents/skills .agents/quality-gate .agents/contracts .github/skills .github/agents .github/scripts .github/workflows"
 
 # ── 子命令解析（首个非选项参数）────────────────────────────────
 # auto = 兼容模式（无子命令的旧用法：未装则安装、已装则升级）
@@ -509,7 +509,7 @@ MDC
     fi
   fi
 
-  # docs/ 、quality-gate/ 与 specs/ 骨架：逐文件只补缺
+  # docs/ 、.agents/quality-gate/ 与 specs/ 骨架：逐文件只补缺
   # 已有文件时检测框架是否有更新，静默报告不覆盖
   while IFS= read -r f; do
     rel="${f#"$script_dir"/templates/}"
@@ -529,7 +529,7 @@ MDC
       mkdir -p "$(dirname "$dst")"
       cp "$f" "$dst"
     fi
-  done < <(find "$script_dir/templates/docs" "$script_dir/templates/quality-gate" "$script_dir/templates/specs" -type f; find "$script_dir/templates" -maxdepth 1 -type f 2>/dev/null)
+  done < <(find "$script_dir/templates/docs" "$script_dir/templates/.agents/quality-gate" "$script_dir/templates/specs" -type f; find "$script_dir/templates" -maxdepth 1 -type f 2>/dev/null)
 
   # Profile 文件差异检测（路径映射: profiles/<name>/X → target/X）
   while IFS= read -r f; do
@@ -553,7 +553,7 @@ MDC
 
   # 保持骨架脚本可执行
   if [ "$dry_run" = false ]; then
-    find "$target_dir/quality-gate" -name '*.sh' -exec chmod +x {} + 2>/dev/null || true
+    find "$target_dir/.agents/quality-gate" -name '*.sh' -exec chmod +x {} + 2>/dev/null || true
   fi
 }
 

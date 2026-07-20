@@ -5,7 +5,7 @@ description: quality-gate 失败或异常后的分层归因：严格按 test→e
 
 # diagnose
 
-**目标项目路径规则**：bug 记录写入**目标项目**的 `docs/bugs/`。测试日志从目标项目的 `quality-gate/` 读取。
+**目标项目路径规则**：bug 记录写入**目标项目**的 `docs/bugs/`。测试日志从目标项目的 `.agents/quality-gate/` 读取。
 
 分析 quality-gate 失败或异常的根因，按优先级分层归因。
 
@@ -16,9 +16,9 @@ description: quality-gate 失败或异常后的分层归因：严格按 test→e
 ## 2. 归因顺序（按此顺序排查，不跳）
 
 1. **测试本身**：断言对不对？fixture 环境变量是否缺失？上次跑绿是什么时候？
-2. **环境**：运行环境是否正常？依赖服务（容器/数据库/消息队列等）是否可达？（跑 `bash quality-gate/l1-smoke/health-check.sh`）
+2. **环境**：运行环境是否正常？依赖服务（容器/数据库/消息队列等）是否可达？（跑 `bash .agents/quality-gate/l1-smoke/health-check.sh`）
 3. **生成物/契约漂移**：schema 是否过期？codegen 输出是否刷新？contract 测试是否通过？
-4. **代码**：最后才判定为代码 Bug。确认前三层无问题后，走 `quality-gate/l2-integration` 按模块缩小范围。
+4. **代码**：最后才判定为代码 Bug。确认前三层无问题后，走 `.agents/quality-gate/l2-integration` 按模块缩小范围。
 
 ## 3. 输出
 
