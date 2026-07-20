@@ -35,18 +35,49 @@ else
 fi
 
 echo ""
-echo "5. Spec 完整性:"
+echo "5. 文档格式校验:"
+warn() { echo "  [WARN] $1"; }
+
+# 5a. Spec 完整性
 if [ -d docs/exec-plans/active ] && ls docs/exec-plans/active/*.md >/dev/null 2>&1; then
   for plan in docs/exec-plans/active/*.md; do
     topic="$(basename "$plan" .md)"
     if [ -d "specs/$topic" ]; then
       echo "  [PASS] $topic → specs/$topic/"
+      # 格式检查
+      if grep -qE '状态|## 功能' "specs/$topic/product.md" 2>/dev/null; then
+        echo "    [PASS] product.md 格式"
+      else
+        warn "    $topic/product.md 缺少状态/功能声明"
+      fi
+      if grep -qE '\*\*关联\*\*' "specs/$topic/tech.md" 2>/dev/null; then
+        echo "    [PASS] tech.md 格式（有关联声明）"
+      else
+        warn "    $topic/tech.md 缺少 **关联** 声明"
+      fi
     else
-      echo "  [WARN] $topic 缺 spec——请先创建 specs/$topic/product.md"
+      warn "  $topic 缺 spec——请先创建 specs/$topic/product.md"
     fi
   done
 else
   echo "  [SKIP] 无活跃 exec-plan"
+fi
+
+# 5b. Work-journal 命名
+if [ -d docs/work-journal ] && ls docs/work-journal/20*.md >/dev/null 2>&1; then
+  bad=$(ls docs/work-journal/ | grep -v '^20[0-9]\{2\}-[0-9]\{2\}-[0-9]\{2\}\.md$' || true)
+  if [ -n "$bad" ]; then
+    warn "work-journal 文件未按 YYYY-MM-DD.md 命名: $bad"
+  fi
+fi
+
+# 5c. Bug 模板
+if [ -d docs/bugs ] && ls docs/bugs/*.md >/dev/null 2>&1; then
+  for b in docs/bugs/*.md; do
+    if grep -qE '## 复现|## 根因' "$b" 2>/dev/null; then :; else
+      warn "$(basename "$b") 缺少 '复现步骤' 或 '根因' 段"
+    fi
+  done
 fi
 
 echo ""
