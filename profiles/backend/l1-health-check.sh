@@ -48,6 +48,23 @@ echo "4. 代码风格（按项目语言取消注释）:"
 # check "Prettier 格式一致" 'npx prettier --check .'
 
 echo ""
+echo "5. Spec 完整性:"
+if [ -d docs/exec-plans/active ] && ls docs/exec-plans/active/*.md >/dev/null 2>&1; then
+  for plan in docs/exec-plans/active/*.md; do
+    topic="$(basename "$plan" .md)"
+    if grep -qE "Full.*档|spec.*驱动" "$plan" 2>/dev/null; then
+      if [ -d "specs/$topic" ]; then
+        echo "  [PASS] $topic → specs/$topic/"
+      else
+        echo "  [WARN] $topic 需要 spec 但 specs/$topic/ 不存在（建议先写 spec）"
+      fi
+    fi
+  done
+else
+  echo "  [SKIP] 无活跃 exec-plan"
+fi
+
+echo ""
 echo "结果: PASS=$PASS  FAIL=$FAIL  SKIP=$SKIP"
 [ "$FAIL" -gt 0 ] && { echo "结论: FAIL"; exit 1; }
 echo "结论: PASS"
