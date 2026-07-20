@@ -147,7 +147,17 @@ detect_platform() {
   case "$remote_url" in
     *gitlab*|*git.selfhosted*) printf 'gitlab' ;;
     *github*) printf 'github' ;;
-    *) printf 'unknown' ;;
+    *)
+      # 自建 GitLab 域名可能不含 gitlab：尝试 API 探测
+      local api_url probe
+      api_url="$(echo "$remote_url" | sed 's|://[^@]*@|://|' | sed 's|\(://[^/]*\).*|\1/api/v4/version|')"
+      probe="$(curl -sf "$api_url" 2>/dev/null)" || true
+      if echo "$probe" | grep -qE '"version"|"message"'; then
+        printf 'gitlab'
+      else
+        printf 'unknown'
+      fi
+      ;;
   esac
 }
 platform=$(detect_platform)
