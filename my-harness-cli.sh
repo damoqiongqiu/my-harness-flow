@@ -413,10 +413,17 @@ install_agents_md() {
     return 0
   fi
 
-  # 2. 已有 harness 标记 → 跳过
+  # 2. 已有 harness 标记 → 检查是否需要刷新
   if grep -q 'my-harness-flow' "$dst" 2>/dev/null; then
-    [ "$dry_run" = false ] && info "提示: AGENTS.md 已含 harness 路由规则，跳过"
-    return 0
+    if grep -q '{{PROJECT_NAME}}\|{{PROJECT_DESCRIPTION}}' "$dst" 2>/dev/null; then
+      # 检测到旧版占位符 → 先剥离旧 harness 段再重新插入
+      sed -i '' '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/d' "$dst"
+      sed -i '' '/<!-- 以下为用户自定义内容.*/,/^$/d; /^---$/{N;d;}' "$dst"
+      info "提示: 检测到旧版 harness 内容，正在刷新..."
+    else
+      [ "$dry_run" = false ] && info "提示: AGENTS.md 已含 harness 路由规则，跳过"
+      return 0
+    fi
   fi
 
   # 3. 用户自有的 AGENTS.md → 静默前置插入 harness 内容
