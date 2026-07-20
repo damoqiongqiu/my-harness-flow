@@ -462,6 +462,18 @@ MDC
     fi
   done < <(find "$script_dir/templates/docs" "$script_dir/templates/tests" "$script_dir/templates/specs" -type f)
 
+  # Profile 文件差异检测（路径映射: profiles/<name>/X → target/X）
+  while IFS= read -r f; do
+    rel="${f#"$script_dir/profiles/"}"
+    local dst="$target_dir/${rel#*/}"   # 去掉 profiles/<name>/ 前缀
+    if [ -e "$dst" ]; then
+      if ! cmp -s "$f" "$dst"; then
+        updated_template_list="${updated_template_list}  - Profile ${rel}"$'\n'
+        updated_count=$((updated_count + 1))
+      fi
+    fi
+  done < <(find "$script_dir/profiles" -type f 2>/dev/null)
+
   # 报告可更新的模板文件
   if [ "$updated_count" -gt 0 ]; then
     info ""
