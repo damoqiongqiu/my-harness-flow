@@ -851,8 +851,14 @@ install_profile() {
     if [ "$dry_run" = true ]; then
       info "  将创建 $rel（profile: $profile_name）"
     else
-      mkdir -p "$(dirname "$target_dir/$rel")"
-      cp "$f" "$target_dir/$rel"
+      case "$rel" in
+        l1-health-check.sh|l2-integration.sh)
+          mkdir -p "$target_dir/.agents/quality-gate"
+          cp "$f" "$target_dir/.agents/quality-gate/$rel" ;;
+        *)
+          mkdir -p "$(dirname "$target_dir/$rel")"
+          cp "$f" "$target_dir/$rel" ;;
+      esac
     fi
   done < <(find "$profile_dir" -type f)
 

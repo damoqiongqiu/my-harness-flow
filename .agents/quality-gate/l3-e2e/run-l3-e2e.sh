@@ -25,7 +25,7 @@ grep -q "profile: web" "$TGT/AGENTS.md" && pass "AGENTS-profile" || fail "AGENTS
 
 # 3. L1 自检
 echo "--- 3. L1 自检 ---"
-if bash "$TGT/l1-health-check.sh" >/dev/null 2>&1; then
+if bash "$TGT/.agents/quality-gate/l1-health-check.sh" >/dev/null 2>&1; then
   pass "L1-self-check"
 else
   fail "L1-self-check" "自检未通过"

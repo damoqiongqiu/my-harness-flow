@@ -14,7 +14,7 @@
 | `docs/reports/` | 复盘报告 | retrospect 写 |
 | `docs/plan/` | 方案摘要 | start-task 可选写 |
 | `specs/` | 产品/技术 spec | write-product-spec/write-tech-spec 写 |
-| `tests/scenarios/` | L1-L5 测试脚本 | quality-gate 跑 |
+| `.agents/quality-gate/` | L1-L5 测试脚本 | quality-gate 跑 |
 
 > **规则**: 如果文件涉及任务进度、工作日志、spec、测试、问题记录——写到本项目。只有 `.agents/` 下的技能文件和 `.github/workflows/` 由 harness 安装器管理，不手动改。
 
@@ -76,9 +76,9 @@
 ## 验证命令（从窄到宽）
 
 ```bash
-bash tests/scenarios/l1-smoke/health-check.sh                                # L1 冒烟（预期：全部通过）
-bash tests/scenarios/l2-integration/run-l2-integration.sh --module <模块名>  # L2 单模块（预期：通过率 ≥ 90%）
-bash tests/scenarios/l5-regression/run-l5-regression.sh                      # L5 全量回归（预期：0 失败）
+bash .agents/quality-gate/l1-smoke/health-check.sh                                # L1 冒烟（预期：全部通过）
+bash .agents/quality-gate/l2-integration/run-l2-integration.sh --module <模块名>  # L2 单模块（预期：通过率 ≥ 90%）
+bash .agents/quality-gate/l5-regression/run-l5-regression.sh                      # L5 全量回归（预期：0 失败）
 ```
 
 ### 验证失败处理路径
