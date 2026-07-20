@@ -165,9 +165,16 @@ detect_platform() {
   esac
 }
 platform=$(detect_platform)
+# 重新获取 remote_url 用于后续检查（detect_platform 内是 local 变量）
+remote_url="$(cd "$target_dir" && git remote get-url origin 2>/dev/null)" || remote_url=""
 [ "$platform" = "gitlab" ] && ! command -v glab >/dev/null 2>&1 && info "检测到 GitLab remote，建议安装 glab CLI: brew install glab"
 # 自建 GitLab 注意：如果 HTTP（非 HTTPS），认证时加 --api-protocol http
 [ "$platform" = "gitlab" ] && [ -n "$remote_url" ] && echo "$remote_url" | grep -q "^http://" && info "GitLab 使用 HTTP: glab auth login 时请加 --api-protocol http"
+# GitLab 平台：自动安装 .gitlab-ci.yml 模板
+if [ "$platform" = "gitlab" ] && [ -f "$script_dir/templates/.gitlab-ci.yml.template" ] && [ ! -f "$target_dir/.gitlab-ci.yml" ]; then
+  cp "$script_dir/templates/.gitlab-ci.yml.template" "$target_dir/.gitlab-ci.yml"
+  info "已安装 .gitlab-ci.yml（GitLab CI Pipeline 模板）"
+fi
 
 # ── 交互工具 ─────────────────────────────────────────────────────
 # 从 /dev/tty 读取用户选择；无 TTY 时返回空（由调用方决定安全默认）。
