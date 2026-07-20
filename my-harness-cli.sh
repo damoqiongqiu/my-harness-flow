@@ -425,9 +425,13 @@ install_agents_md() {
     return 0
   fi
 
-  # 提取模板中 harness section
+  # 提取模板中 harness section，替换占位符
   local harness_section
-  harness_section="$(sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl")"
+  local project_name
+  project_name="$(basename "$target_dir")"
+  harness_section="$(sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
+    | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" \
+    | grep -vxF '')"
 
   # 前置插入：harness 头部 + 用户原内容
   local tmp="$(mktemp "${TMPDIR:-/tmp}/hf-agents-XXXXXX")"
