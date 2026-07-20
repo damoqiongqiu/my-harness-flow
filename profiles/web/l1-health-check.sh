@@ -21,8 +21,18 @@ check "node_modules 存在" '[ -d node_modules ]'
 echo ""
 echo "3. 代码质量:"
 check "TypeScript 类型检查" 'npx tsc --noEmit'
-check "ESLint 零错误" 'npx eslint . --max-warnings=0 2>/dev/null || echo "(可跳过)"'
-check "Jest 单测通过" 'npx jest --passWithNoTests 2>/dev/null || echo "(可跳过)"'
+if [ -x node_modules/.bin/eslint ]; then
+  check "ESLint 零错误" 'npx eslint . --max-warnings=0'
+else
+  echo "  [SKIP] ESLint 未安装"
+  SKIP=$((SKIP+1))
+fi
+if [ -x node_modules/.bin/jest ]; then
+  check "Jest 单测通过" 'npx jest --passWithNoTests'
+else
+  echo "  [SKIP] Jest 未安装"
+  SKIP=$((SKIP+1))
+fi
 
 echo ""
 echo "结果: PASS=$PASS  FAIL=$FAIL  SKIP=$SKIP"
