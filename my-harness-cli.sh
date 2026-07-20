@@ -283,7 +283,7 @@ sync_managed_dirs() {
     while IFS= read -r fw_file; do
       fw_rel="${fw_file#"$script_dir"/}"
       case "$fw_rel" in
-        */.DS_Store|.github/workflows/ci.yml|*.github/skills/*-repo/*) continue ;;
+        */.DS_Store|.github/workflows/ci.yml|*.github/skills/*-repo/*|*harness-tests/*|*harness-tests*) continue ;;
       esac
       tg_file="$target_dir/$fw_rel"
       fw_hash="$(sha256_this "$fw_file")"
