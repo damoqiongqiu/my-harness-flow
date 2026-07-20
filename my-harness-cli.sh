@@ -151,10 +151,10 @@ detect_platform() {
       # 自建 GitLab 域名可能不含 gitlab：尝试 API 探测（HTTP + HTTPS）
       local api_url probe
       api_url="$(echo "$remote_url" | sed 's|://[^@]*@|://|' | sed 's|\(://[^/]*\).*|\1/api/v4/version|')"
-      probe="$(curl -sf "$api_url" 2>/dev/null)" || true
+      probe="$(curl -sf --connect-timeout 5 --max-time 10 "$api_url" 2>/dev/null)" || true
       if [ -z "$probe" ]; then
         api_url="$(echo "$api_url" | sed 's|^http://|https://|')"
-        probe="$(curl -sf "$api_url" 2>/dev/null)" || true
+        probe="$(curl -sf --connect-timeout 5 --max-time 10 "$api_url" 2>/dev/null)" || true
       fi
       if echo "$probe" | grep -qE '"version"|"message"'; then
         printf 'gitlab'
