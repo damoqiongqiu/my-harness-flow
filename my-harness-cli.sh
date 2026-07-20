@@ -406,37 +406,42 @@ install_agents_md() {
   local tpl="$script_dir/templates/AGENTS.md.template"
   local dst="$target_dir/AGENTS.md"
 
+  # 1. 无 AGENTS.md → 全新创建
   if [ ! -e "$dst" ]; then
     install_file_if_missing "$tpl" "$dst"
     [ "$dry_run" = false ] && info "提示: 已生成 AGENTS.md，请替换其中 {{PROJECT_NAME}} 等占位符。"
     return 0
   fi
 
-  # 已有 AGENTS.md：永不静默覆盖
-  if [ "$dry_run" = true ]; then
-    info "AGENTS.md 已存在：实际执行时将询问 保留/覆盖/另存为 AGENTS.md.harness"
+  # 2. 已有 harness 标记 → 跳过
+  if grep -q 'my-harness-flow' "$dst" 2>/dev/null; then
+    [ "$dry_run" = false ] && info "提示: AGENTS.md 已含 harness 路由规则，跳过"
     return 0
   fi
-  local choice
-  if [ "$non_interactive" = true ]; then
-    choice="k"
-  else
-    choice="$(ask_user '目标已有 AGENTS.md。[k]保留 / [o]用框架模板覆盖 / [h]框架模板另存为 AGENTS.md.harness（默认 k）: ')"
+
+  # 3. 用户自有的 AGENTS.md → 静默前置插入 harness 内容
+  if [ "$dry_run" = true ]; then
+    info "提示: AGENTS.md 已存在（无 harness 标记），将前置插入 harness 路由规则"
+    return 0
   fi
-  case "$choice" in
-    o|O)
-      cp "$tpl" "$dst"
-      info "→ 已用框架模板覆盖 AGENTS.md（原内容已被替换，请自行从 git 历史找回）" ;;
-    h|H)
-      if [ -e "$dst.harness" ]; then
-        info "→ AGENTS.md.harness 已存在，未重复生成"
-      else
-        cp "$tpl" "$dst.harness"
-        info "→ 框架模板已另存为 AGENTS.md.harness，请手动合并后删除该文件"
-      fi ;;
-    *)
-      info "→ 保留已有 AGENTS.md（如需框架版本，见 templates/AGENTS.md.template）" ;;
-  esac
+
+  # 提取模板中 harness section
+  local harness_section
+  harness_section="$(sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl")"
+
+  # 前置插入：harness 头部 + 用户原内容
+  local tmp="$(mktemp "${TMPDIR:-/tmp}/hf-agents-XXXXXX")"
+  {
+    echo "$harness_section"
+    echo ""
+    echo "---"
+    echo ""
+    echo "<!-- 以下为用户自定义内容，由 my-harness-flow 原样保留 -->"
+    echo ""
+    cat "$dst"
+  } > "$tmp"
+  mv "$tmp" "$dst"
+  info "提示: harness 路由规则已插入 AGENTS.md 头部，你的内容在下方原样保留。"
 }
 
 install_templates() {

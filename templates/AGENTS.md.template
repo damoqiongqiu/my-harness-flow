@@ -1,5 +1,7 @@
 # {{PROJECT_NAME}}
 
+<!-- my-harness-flow: begin -->
+
 {{PROJECT_DESCRIPTION}}
 
 ## 0. 路径约定（CRITICAL）
@@ -119,6 +121,8 @@ Profile 技能已在 `.agents/skills/` 下，与核心技能一起注册。
 
 - 格式 `type(scope): summary`，类型 feat/fix/docs/refactor/test/chore/style/cleanup，范围用项目模块名
 - 禁止 git add .（精确 stage）、禁止 --no-verify、禁止 --no-gpg-sign
+
+<!-- my-harness-flow: end -->
 
 ### 示例
 
