@@ -417,25 +417,24 @@ install_agents_md() {
     return 0
   fi
 
-  # 2. 已有 harness 标记段 → 原地替换内容
+  # 2. 已有 harness 标记段 → 原地替换到最新模板内容
   if grep -q 'my-harness-flow: begin' "$dst" 2>/dev/null; then
-    if grep -q '{{PROJECT_NAME}}\|{{PROJECT_DESCRIPTION}}' "$dst" 2>/dev/null; then
-      # 标记段内有占位符 → 原地替换（不移动、不删用户内容）
+    # 生成本次应该有的 harness 内容
+    local fresh; fresh="$(mktemp "${TMPDIR:-/tmp}/hf-fresh-XXXXXX")"
+    sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
+      | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" > "$fresh"
+    # 提取当前文件中 harness 标记段内容做比较
+    local current; current="$(mktemp "${TMPDIR:-/tmp}/hf-current-XXXXXX")"
+    sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$dst" > "$current"
+    if ! cmp -s "$fresh" "$current" 2>/dev/null; then
+      # 内容不同 → 原地替换
       if [ "$dry_run" = false ]; then
-        local htmp; htmp="$(mktemp "${TMPDIR:-/tmp}/hf-harness-XXXXXX")"
-        sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
-          | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" > "$htmp"
-        python3 "$script_dir/.agents/scripts/replace_harness_section.py" "$dst" "$htmp"
-        rm -f "$htmp"
-        bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
-        info "提示: 检测到旧版 harness 内容，已原位刷新"
+        python3 "$script_dir/.agents/scripts/replace_harness_section.py" "$dst" "$fresh"
+        info "提示: 检测到 harness 模板有更新，已原位刷新 AGENTS.md"
       fi
-      return 0
     fi
-    [ "$dry_run" = false ] && {
-      bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
-      info "提示: AGENTS.md 已含 harness 路由规则，跳过"
-    }
+    rm -f "$fresh" "$current"
+    [ "$dry_run" = false ] && bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
     return 0
   fi
 
