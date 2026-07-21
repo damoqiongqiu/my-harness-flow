@@ -657,7 +657,8 @@ register_agent_skills() {
       if [ "$dry_run" = true ]; then
         info "将创建软链: $dst/$name -> .agents/skills/$name"
       else
-        safe_link "${d%/}" "$dst/$name"
+        local rel; rel="$(python3 -c "import os; print(os.path.relpath('${d%/}', os.path.dirname('$dst/$name')))" 2>/dev/null)"
+        safe_link "$rel" "$dst/$name"
       fi
       linked=$((linked + 1))
     done
@@ -916,7 +917,8 @@ install_profile() {
       for agent_dir in "$target_dir/.claude/skills" "$target_dir/.gemini/skills" "$HOME/.workbuddy/skills"; do
         [ -d "$agent_dir" ] || continue
         [ -e "$agent_dir/$name" ] && continue
-        safe_link "$target_dir/.agents/skills/$name" "$agent_dir/$name" 2>/dev/null || true
+        local rel_src; rel_src="$(python3 -c "import os; print(os.path.relpath('$target_dir/.agents/skills/$name', '$agent_dir'))" 2>/dev/null)"
+        safe_link "$rel_src" "$agent_dir/$name" 2>/dev/null || true
       done
     done
     info "  → profile '$profile_name' 技能已安装并注册"
