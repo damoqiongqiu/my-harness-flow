@@ -432,7 +432,10 @@ install_agents_md() {
       fi
       return 0
     fi
-    [ "$dry_run" = false ] && info "提示: AGENTS.md 已含 harness 路由规则，跳过"
+    [ "$dry_run" = false ] && {
+      bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
+      info "提示: AGENTS.md 已含 harness 路由规则，跳过"
+    }
     return 0
   fi
 
