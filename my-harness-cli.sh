@@ -681,7 +681,6 @@ write_marker() {
   mkdir -p "$(dirname "$target_dir/$marker_rel")"
   {
     printf 'installed_at=%s\n' "$(date '+%Y-%m-%d %H:%M:%S')"
-    printf 'source=%s\n' "$script_dir"
     printf 'version=%s\n' "$(get_version)"
   } > "$target_dir/$marker_rel"
 }
