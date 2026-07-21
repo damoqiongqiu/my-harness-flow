@@ -410,7 +410,7 @@ install_agents_md() {
   local project_name; project_name="$(basename "$target_dir")"
   if [ ! -e "$dst" ]; then
     if [ "$dry_run" = false ]; then
-      sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g" "$tpl" > "$dst"
+      sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}|<!-- TODO: 填写核心模块名 -->|g; s|{{MODULE_2}}|<!-- TODO: 继续添加 -->|g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" "$tpl" > "$dst"
       bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$dst"
       info "提示: 已生成 AGENTS.md"
     fi
@@ -422,7 +422,7 @@ install_agents_md() {
     # 生成本次应该有的 harness 内容
     local fresh; fresh="$(mktemp "${TMPDIR:-/tmp}/hf-fresh-XXXXXX")"
     sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
-      | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" > "$fresh"
+      | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}|<!-- TODO: 填写核心模块名 -->|g; s|{{MODULE_2}}|<!-- TODO: 继续添加 -->|g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" > "$fresh"
     # 提取当前文件中 harness 标记段内容做比较
     local current; current="$(mktemp "${TMPDIR:-/tmp}/hf-current-XXXXXX")"
     sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$dst" > "$current"
@@ -447,7 +447,7 @@ install_agents_md() {
   # 提取模板中 harness section
   local harness_section
   harness_section="$(sed -n '/<!-- my-harness-flow: begin -->/,/<!-- my-harness-flow: end -->/p' "$tpl" \
-    | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}||g; s|{{MODULE_2}}||g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" \
+    | sed "s|{{PROJECT_NAME}}|${project_name}|g; s|{{PROJECT_DESCRIPTION}}||g; s|{{MODULE_1}}|<!-- TODO: 填写核心模块名 -->|g; s|{{MODULE_2}}|<!-- TODO: 继续添加 -->|g; s|{{CORE_MODULES}}||g; s|{{PROJECT_HARD_RULE_1}}||g" \
     | grep -vxF '')"
 
   # 前置插入
