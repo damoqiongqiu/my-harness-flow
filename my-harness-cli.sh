@@ -548,8 +548,11 @@ MDC
     else
       mkdir -p "$(dirname "$dst")"
       cp "$f" "$dst"
+      case "$(basename "$dst")" in
+        MEMORY.md) sed -i '' "s|{{PROJECT_NAME}}|$(basename "$target_dir")|g" "$dst" ;;
+      esac
     fi
-  done < <(find "$script_dir/templates/docs" "$script_dir/templates/.agents/quality-gate" "$script_dir/templates/specs" "$script_dir/templates/.cursor" -type f; find "$script_dir/templates" -maxdepth 1 -type f 2>/dev/null)
+  done < <(find "$script_dir/templates/docs" "$script_dir/templates/.agents/quality-gate" "$script_dir/templates/specs" "$script_dir/templates/.cursor" "$script_dir/templates/.workbuddy" -type f; find "$script_dir/templates" -maxdepth 1 -type f 2>/dev/null)
 
   # Profile 文件差异检测（路径映射: profiles/<name>/X → target/X）
   while IFS= read -r f; do
