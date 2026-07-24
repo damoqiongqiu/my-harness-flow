@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+# Agent Guidance
+
+遵循仓库根目录 `AGENTS.md` 中的共享指引。
+
+任务级工作流在 `.agents/skills/*/SKILL.md`。当请求点名某个 skill 或明显匹配其用途时，使用对应 skill。
