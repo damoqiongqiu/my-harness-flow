@@ -880,6 +880,7 @@ install_profile() {
       else
         printf '\n' >> "$target_dir/AGENTS.md"
         cat "$append_file" >> "$target_dir/AGENTS.md"
+        bash "$script_dir/.agents/scripts/normalize_agents_headings.sh" "$target_dir/AGENTS.md"
         info "  → profile '$profile_name' 路由规则已追加到 AGENTS.md"
       fi
     fi
