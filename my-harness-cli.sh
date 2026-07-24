@@ -589,23 +589,41 @@ ensure_gitignore() {
 .gemini/
 __pycache__/
 docs/tmp/"
+  local added=0
 
-  # 先检查是否已有 harness 管理的区段
-  if [ -f "$gitignore" ] && grep -qF "$marker" "$gitignore"; then
-    return 0  # 已有，不做重复追加
-  fi
-
+  # 逐条检查缺失的条目，幂等地追加
   if [ "$dry_run" = true ]; then
-    info "将追加 $gitignore: agent 本地状态目录忽略规则"
+    local missing=""
+    while IFS= read -r entry; do
+      [ -z "$entry" ] && continue
+      if [ -f "$gitignore" ] && grep -qF "$entry" "$gitignore"; then
+        continue
+      fi
+      missing="$missing $entry"
+    done <<< "$entries"
+    if [ -n "$missing" ]; then
+      info "将追加 $gitignore: 缺失的忽略规则$missing"
+    fi
     return 0
   fi
 
-  {
-    echo ""
-    echo "$marker: agent 本地状态（不提交版本库）"
-    echo "$entries"
-  } >> "$gitignore"
-  info "已追加 $gitignore 忽略规则（.workbuddy/ .claude/ .gemini/ __pycache__/ docs/tmp/）"
+  while IFS= read -r entry; do
+    [ -z "$entry" ] && continue
+    if [ -f "$gitignore" ] && grep -qF "$entry" "$gitignore"; then
+      continue
+    fi
+    # 先确保有 marker 注释
+    if ! grep -qF "$marker" "$gitignore" 2>/dev/null; then
+      echo "" >> "$gitignore"
+      echo "$marker: agent 本地状态（不提交版本库）" >> "$gitignore"
+    fi
+    echo "$entry" >> "$gitignore"
+    added=$((added + 1))
+  done <<< "$entries"
+
+  if [ "$added" -gt 0 ]; then
+    info "已追加 $gitignore 忽略规则（.workbuddy/ .claude/ .gemini/ __pycache__/ docs/tmp/）"
+  fi
 }
 
 # ── 第三步：多 agent 技能软链注册 ────────────────────────────────
