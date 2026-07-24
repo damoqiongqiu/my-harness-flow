@@ -580,6 +580,33 @@ MDC
   fi
 }
 
+# ── 2.5：确保目标项目 .gitignore 忽略 agent 本地状态 ──────────────
+ensure_gitignore() {
+  local gitignore="$target_dir/.gitignore"
+  local marker="# my-harness-flow"
+  local entries=".workbuddy/
+.claude/
+.gemini/
+__pycache__/"
+
+  # 先检查是否已有 harness 管理的区段
+  if [ -f "$gitignore" ] && grep -qF "$marker" "$gitignore"; then
+    return 0  # 已有，不做重复追加
+  fi
+
+  if [ "$dry_run" = true ]; then
+    info "将追加 $gitignore: agent 本地状态目录忽略规则"
+    return 0
+  fi
+
+  {
+    echo ""
+    echo "$marker: agent 本地状态（不提交版本库）"
+    echo "$entries"
+  } >> "$gitignore"
+  info "已追加 $gitignore 忽略规则（.workbuddy/ .claude/ .gemini/ __pycache__/）"
+}
+
 # ── 第三步：多 agent 技能软链注册 ────────────────────────────────
 register_agent_skills() {
   local src="$target_dir/.agents/skills"
@@ -931,6 +958,7 @@ case "$command" in
 esac
 
 if [ "$register_only" = true ]; then
+  ensure_gitignore
   register_agent_skills
   [ "$dry_run" = true ] && info "dry-run 结束，未写任何文件。"
   exit 0
@@ -950,6 +978,7 @@ case "$state" in
       info "受管文件与框架版本完全一致，无需同步；仅校验技能注册。"
       [ "$with_templates" = true ] && install_templates
       install_profile
+      ensure_gitignore
       register_agent_skills
       write_marker
       write_manifest
@@ -961,6 +990,7 @@ esac
 sync_managed_dirs
 [ "$with_templates" = true ] && install_templates
 install_profile
+ensure_gitignore
 register_agent_skills
 write_marker
 write_manifest
