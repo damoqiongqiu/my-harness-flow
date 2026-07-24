@@ -19,7 +19,7 @@
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 基础技能（15 个） | git-commit / git-branch / git-push / git-worktree / resolve-merge-conflicts / create-issue / create-pr / review-pr-local / review-spec-local / pr-walkthrough / write-tech-spec / write-product-spec / spec-driven-implementation / diagnose-ci-failures / bootstrap-issue-config |
 | 编排技能（6 个）  | start-task（定档+分支+计划）/ quality-gate（分层验证）/ finish-task（提交+归档+留痕）/ session-start（上下文恢复）/ diagnose（失败归因）/ retrospect（证据复盘）                                                                                                                  |
-| 多 agent 注册     | WorkBuddy（用户级）/ Claude Code / Gemini CLI 软链注册，Codex CLI 原生扫描                                                                                                                                                                                                        |
+| 多 agent 注册     | WorkBuddy（用户级+项目级）/ Claude Code / Gemini CLI 软链注册，Codex CLI 原生扫描，Cursor 指引接入（.cursor/rules/agents.mdc）           |
 | 项目模板          | AGENTS.md 路由表模板 + docs 骨架 + L1-L5 分层测试骨架                                                                                                                                                                                                                             |
 | CI 自动化         | 17 个 CI 技能 + 12 个受管 workflow + 支撑脚本（issue triage / spec 生成 / issue 实现 / PR review）                                                                                                                                                                                |
 
@@ -29,19 +29,29 @@
 新需求/发现 bug
     │
     ▼
-start-task ──定档──> Light / Standard / Full（+ spec 驱动决策）
-    │                     建分支 + 写 exec-plan
-    ▼
-（实现改动）
+session-start（跨会话恢复上下文）
     │
     ▼
-quality-gate ──按档分层验证──> L1 冒烟 → L2 单元 → L3 E2E → L5 回归
-    │                              任一层 FAIL → diagnose 归因（test→env→artifact→code）
-    ▼
-finish-task ──> 精确提交 + 推送 + PR + 归档 exec-plan + 写工作日志
+start-task ──── §1 定档 ────> Light / Standard / Full
+    │         §2 读 specs/README.md
+    │         §3 spec 驱动决策
+    │             ├── [是] → §3.1 建 spec 目录 + 调用 write-product-spec/
+    │             │          write-tech-spec 填充内容 🔒 自动模式激活
+    │             └── [否] → 按 README 要求补 Light 级 spec（如有）
+    │         §4 建分支 + §5 写 exec-plan（有 spec 则精简引用）
+    │
+    ├── §8.1 实现阶段（先读 spec → 按验收标准编码）
+    │
+    ├── §8.2 验证阶段 ──> quality-gate（按档 L1→L2→L3→L5）
+    │         │              任一层 FAIL → diagnose 归因
+    │         │              修复后从失败层重跑，3 次上限上报用户
+    │         └── PASS ──> §8.3 收尾阶段 ──> finish-task
+    │                                              精确提交 + 推送 + PR
+    │                                              归档 exec-plan + 写工作日志
+    └── 异常 ──> diagnose（test→env→artifact→code 归因链）
 ```
 
-辅助：`session-start`（跨会话恢复上下文）、`retrospect`（基于工作日志的证据复盘）。
+辅助：`retrospect`（基于工作日志的证据复盘）。全程通过 `session-start` 断点续传。
 
 ![任务工作流](docs/design-docs/imgs/harness-workflow.svg)
 
@@ -129,14 +139,16 @@ HARNESS_FLOW_ANSWER=k ./my-harness-cli.sh install --target ./repo
 | `--force` | install（旧安装） | 冲突不提问，直接覆盖（CI 场景；manifest 存在时无效） |
 | `--skip-existing` | install（旧安装） | 冲突不提问，保留已有只新增 |
 
-安装器做三件事：
+安装器做四件事：
 
 1. **受管目录同步**（rsync，可重复执行）：`.agents/skills`、`.agents/contracts`、`.github/{skills,agents,scripts,workflows}`
-2. **模板实例化**（只补缺，绝不覆盖已有文件）：`AGENTS.md`、`CLAUDE.md`、`docs/{bugs,design-docs,exec-plans,generated,plan,product-specs,references,reports,work-journal}`、`specs/`（含产品/技术 spec 模板）、`.agents/quality-gate/{l1..l5}`
-3. **多 agent 技能注册**（软链，幂等）：
-   - WorkBuddy → `~/.workbuddy/skills/`（**用户级**——harness 只扫用户级目录，不扫项目级）
+2. **模板实例化**（只补缺，绝不覆盖已有文件）：`AGENTS.md`、`CLAUDE.md`、`docs/{bugs,design-docs,exec-plans,generated,plan,product-specs,references,reports,work-journal}`、`specs/`（含产品/技术 spec 模板）、`.agents/quality-gate/{l1..l5}`、`.cursor/rules/agents.mdc`（Cursor 指引）
+3. **`.gitignore` 保护**：自动追加 agent 本地状态目录忽略规则（`.workbuddy/` `.claude/` `.gemini/` `__pycache__/`），防止开发环境文件被提交（幂等，已有标记区段时跳过）
+4. **多 agent 技能注册**（软链，幂等）：
+   - WorkBuddy → `~/.workbuddy/skills/`（**用户级**）和 `.workbuddy/skills/`（项目级）
    - Claude Code → `.claude/skills/`、Gemini CLI → `.gemini/skills/`（项目级，agentskills.io 规范）
    - Codex CLI → 原生扫描 `.agents/skills/`，无需注册
+   - Cursor → `.cursor/rules/agents.mdc`（指引接入，指向 AGENTS.md）
 
 安装后必做：
 
