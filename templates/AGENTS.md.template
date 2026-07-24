@@ -101,6 +101,7 @@ bash .agents/quality-gate/l5-regression/run-l5-regression.sh                    
 <!-- 项目特定的硬性约束，按需增删 -->
 - **Secrets 零硬编码**：禁止在配置/代码中明文，必须用 ${ENV_VAR} 或 ${ENV_VAR:-default}
 - **流程门禁**：修改任何现有文件前必须先调 `start-task` SKILL，禁止未经 `start-task` 直接 git add/commit。纯运维巡检不改代码不触发此规则
+- **临时文件零散落**：所有临时/中间/调试产物必须写入 `docs/tmp/`，禁止在项目根目录、`src/`、`specs/` 等下创建 `overview.md`、`tmp*` 等散落文件。`docs/tmp/` 已加入 `.gitignore`，不会提交
 - {{PROJECT_HARD_RULE_1}}
 
 ## 9. 领域 Profile（如有）

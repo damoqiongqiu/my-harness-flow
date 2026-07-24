@@ -466,7 +466,7 @@ install_templates() {
   # 目标已有 docs/ 目录且非 harness 首次安装 → 提示用户
   if [ -d "$target_dir/docs" ] && [ "$state" != "initialized" ]; then
     # 检查 docs/ 下是否有非 harness 模板的文件
-    local harness_templates="exec-plans work-journal bugs reports plan references design-docs generated product-specs"
+    local harness_templates="exec-plans work-journal bugs reports plan tmp references design-docs generated product-specs"
     local has_custom=0
     for entry in "$target_dir/docs"/*; do
       [ ! -e "$entry" ] && continue
@@ -587,7 +587,8 @@ ensure_gitignore() {
   local entries=".workbuddy/
 .claude/
 .gemini/
-__pycache__/"
+__pycache__/
+docs/tmp/"
 
   # 先检查是否已有 harness 管理的区段
   if [ -f "$gitignore" ] && grep -qF "$marker" "$gitignore"; then
@@ -604,7 +605,7 @@ __pycache__/"
     echo "$marker: agent 本地状态（不提交版本库）"
     echo "$entries"
   } >> "$gitignore"
-  info "已追加 $gitignore 忽略规则（.workbuddy/ .claude/ .gemini/ __pycache__/）"
+  info "已追加 $gitignore 忽略规则（.workbuddy/ .claude/ .gemini/ __pycache__/ docs/tmp/）"
 }
 
 # ── 第三步：多 agent 技能软链注册 ────────────────────────────────

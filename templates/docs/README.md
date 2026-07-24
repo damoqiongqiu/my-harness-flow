@@ -7,4 +7,5 @@
 | `docs/exec-plans/completed/` | `finish-task` 归档 | 复盘查阅 |
 | `docs/work-journal/` | `finish-task` 追加 | `retrospect`（证据复盘） |
 | `docs/bugs/` | `diagnose`（确认代码 Bug 后） | `session-start`（风险提示） |
+| `docs/tmp/` | Agent 临时文件（overview.md、调试产物等） | 无（仅临时存放，已 gitignore） |
 | `specs/` | `write-product-spec` / `write-tech-spec` | `spec-driven-implementation` / `start-task` |
