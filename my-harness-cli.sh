@@ -586,6 +586,7 @@ register_agent_skills() {
   # 注册表："label:skills目录"（以 / 开头视为绝对路径 = 用户级）
   set -- \
     "WorkBuddy:$HOME/.workbuddy/skills" \
+    "WorkBuddy Proj:.workbuddy/skills" \
     "Claude Code:.claude/skills" \
     "Gemini CLI:.gemini/skills"
 
@@ -597,23 +598,6 @@ register_agent_skills() {
   # 提示用户级副作用
   if [ "$dry_run" = false ]; then
     info "提示: 技能将注册到 $HOME/.workbuddy/skills/ 等目录，涉及当前用户环境。"
-  fi
-
-  # 遗留迁移：清理历史版本注册到项目级 .workbuddy/skills/ 的软链（该目录不在扫描范围）
-  local legacy_dst="$target_dir/.workbuddy/skills"
-  if [ -d "$legacy_dst" ]; then
-    for d in "$legacy_dst"/*; do
-      [ -L "$d" ] || continue
-      case "$(readlink "$d")" in
-        "$src"/*|"$src")
-          if [ "$dry_run" = true ]; then
-            info "将移除遗留项目级软链: ${d#"$target_dir"/}"
-          else
-            rm "$d"
-          fi ;;
-      esac
-    done
-    [ "$dry_run" = true ] || rmdir "$legacy_dst" 2>/dev/null || true
   fi
 
   for entry; do
