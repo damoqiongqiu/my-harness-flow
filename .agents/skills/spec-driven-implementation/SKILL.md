@@ -98,12 +98,17 @@ specs/issue-<issue-number>/tech.md
 > **注意**：如果通过 `start-task` 流程进入（推荐路径），`specs/<slug>/product.md` 和 `specs/<slug>/tech.md` **可能已被 `start-task` 的 §3.1 创建并填充了内容**（它直接调用了 `write-product-spec` 和 `write-tech-spec`）。**先检查文件是否存在且内容非空**；若已有实质内容则跳过本步及后续书写步骤（§2-§3），直接进入 §4（实现阶段）。  
 > 此 SKILL 保留独立的模板创建逻辑，仅在 `start-task` 未介入时（如直接调用本 SKILL）作为兜底。
 
-确定功能简称（slug，小写字母 + 连字符，如 `add-2fa`、`fix-order-precision`），创建目录并将模板作为初始骨架：
+确定功能简称（slug，小写字母 + 连字符，如 `add-2fa`、`fix-order-precision`），创建目录并将模板作为初始骨架。**模板可能位于 `specs/`（安装后的目标项目）或 `templates/specs/`（框架本体仓库），先用前者，不存在则用后者：**
 
 ```bash
 mkdir -p specs/<slug>
-cp templates/specs/_template-product.md specs/<slug>/product.md
-cp templates/specs/_template-tech.md specs/<slug>/tech.md
+if [ -f specs/_template-product.md ]; then
+  cp specs/_template-product.md specs/<slug>/product.md
+  cp specs/_template-tech.md specs/<slug>/tech.md
+else
+  cp templates/specs/_template-product.md specs/<slug>/product.md
+  cp templates/specs/_template-tech.md specs/<slug>/tech.md
+fi
 ```
 
 模板基于 `spec-driven-implementation` 的产品/技术 spec 规范编写，包含完整章节骨架。后续 `write-product-spec` 和 `write-tech-spec` 在此骨架上填充内容。模板文件以 `_template-` 前缀命名，方便 grep 排除。
