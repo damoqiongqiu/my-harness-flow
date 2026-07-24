@@ -24,7 +24,7 @@ specs/
 
 ## 3. 何时写 spec
 
-**任何 `docs/exec-plans/active/` 下的 exec-plan 都必须有对应 spec。** L1 质量门禁会检查这项约束。
+**走 spec 驱动的任务，exec-plan 通过 `Spec 目录` 字段引用 `specs/` 下的对应目录，不再重复书写目标和验证方式。** L1 质量门禁检查：若 exec-plan 声明了 `Spec 目录`，则该目录必须存在且包含对应的 spec 文件。
 
 | 任务规模 | spec 要求 |
 |----------|----------|
